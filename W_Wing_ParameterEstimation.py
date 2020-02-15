@@ -5,22 +5,22 @@ import numpy as np
 
 
 def geo2W_WingCoord(theta1,theta2,L): #assuming same ratio RADIANS
-    z_1 = L*(np.cos(theta1))
+    z_1 = L*(np.cos(theta1)) if L*(np.cos(theta1)) > 0.01 else 0
 
-    y_1 = L*(np.sin(theta1))
+    y_1 = L*(np.sin(theta1)) if L*(np.sin(theta1)) < 0.99 else 1
 
-    z_2 = L*(np.sin(theta2))
+    z_2 = L*(np.sin(theta2)) if  L*(np.sin(theta2)) > 0.01 else 0
 
-    dfW = np.array([z_1,y_1,z_2])
+    dfW = np.array([z_1 , y_1, z_2])
     return dfW
 
 # 30 < t1 < 90
 # 0 t2 < 60
 
-x_trans = geo2W_WingCoord(np.pi/2,np.pi/30, 1)
+x_trans = geo2W_WingCoord((np.pi/2),0, 1)
 
 
-
+print(x_trans)
 
 
 testPlane = ae.Airplane(
@@ -34,7 +34,7 @@ testPlane = ae.Airplane(
             xsecs=[# The wing's cross ("X") sections
                 ae.WingXSec(  # Root
                     xyz_le=[0, 0, x_trans[0]],  # Coordinates of the XSec's leading edge, relative to the wing's leading edge.
-                    chord=0.18,
+                    chord=0.1,
                     twist=2,  # degrees
                     airfoil=ae.Airfoil(name="naca0003"),
                     control_surface_type='symmetric',
@@ -43,8 +43,8 @@ testPlane = ae.Airplane(
                     control_surface_hinge_point=0.75  # as chord fraction
                 ),
                 ae.WingXSec(  # Mid
-                    xyz_le=[0, x_trans[1], 0],
-                    chord=0.16,
+                    xyz_le=[0, x_trans[1]/2, 0],
+                    chord=0.1,
                     twist=0,
                     airfoil=ae.Airfoil(name="naca0003"),
                     control_surface_type='asymmetric',  # Aileron
